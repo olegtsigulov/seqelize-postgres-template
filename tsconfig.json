@@ -12,7 +12,8 @@
     "sourceMap": true,
     "allowJs": true,
     "outDir": "./dist",
-    "baseUrl": "./src"
+    "jsx": "react",
+    "noEmit": false
   },
   "include": [
     "migrate.ts",
@@ -20,7 +21,7 @@
     "src/shared/config/**/*.ts",
     "src/shared/filters/**/*.ts",
     "src/shared/errors/**/*.ts",
-    "src/shared/guards/**/*.ts",
+    "src/shared/middlewares/**/*.ts",
     "migrations/**/*.ts",
     "src/modules/common/models/**/*.ts",
     "src/modules/**/*.ts",
