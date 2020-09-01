@@ -10,7 +10,8 @@ export async function up(sequelize) {
             "birthday" TIMESTAMP,
             "createdAt" TIMESTAMP NOT NULL,
             "updatedAt" TIMESTAMP NOT NULL,
-            "deletedAt" TIMESTAMP
+            "deletedAt" TIMESTAMP,
+            "status" VARCHAR(30) NOT NULL size ENUM('active', 'banned') DEFAULT 'active'
         );
     `);
 

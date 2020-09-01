@@ -7,17 +7,17 @@ export class MessageCodeError extends Error {
     public errorMessage: string;
 
     constructor(messageCode: string) {
-        super();
+      super();
 
-        const errorMessageConfig = this.getMessageFromMessageCode(messageCode);
-        if (!errorMessageConfig) throw new Error('Unable to find message code error.');
+      const errorMessageConfig = this.getMessageFromMessageCode(messageCode);
+      if (!errorMessageConfig) throw new Error('Unable to find message code error.');
 
-        Error.captureStackTrace(this, this.constructor);
-        this.name = this.constructor.name;
-        this.httpStatus = errorMessageConfig.httpStatus;
-        this.messageCode = messageCode;
-        this.errorMessage = errorMessageConfig.errorMessage;
-        this.message = errorMessageConfig.userMessage;
+      Error.captureStackTrace(this, this.constructor);
+      this.name = this.constructor.name;
+      this.httpStatus = errorMessageConfig.httpStatus;
+      this.messageCode = messageCode;
+      this.errorMessage = errorMessageConfig.errorMessage;
+      this.message = errorMessageConfig.userMessage;
     }
 
     /**
@@ -26,16 +26,16 @@ export class MessageCodeError extends Error {
      * @return {IErrorMessages}
      */
     private getMessageFromMessageCode(messageCode: string): IErrorMessages {
-        let errorMessageConfig: IErrorMessages | undefined;
-        Object.keys(errorMessagesConfig).some(key => {
-            if (key === messageCode) {
-                errorMessageConfig = errorMessagesConfig[key];
-                return true;
-            }
-            return false;
-        });
+      let errorMessageConfig: IErrorMessages | undefined;
+      Object.keys(errorMessagesConfig).some((key) => {
+        if (key === messageCode) {
+          errorMessageConfig = errorMessagesConfig[key];
+          return true;
+        }
+        return false;
+      });
 
-        if (!errorMessageConfig) throw new Error('Unable to find the given message code error.');
-        return errorMessageConfig;
+      if (!errorMessageConfig) throw new Error('Unable to find the given message code error.');
+      return errorMessageConfig;
     }
 }

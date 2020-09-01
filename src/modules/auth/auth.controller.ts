@@ -1,18 +1,18 @@
-import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
-import { MessageCodeError } from '../../shared';
+import {
+  Body, Controller, HttpStatus, Post, Res, UsePipes,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { ValidationPipe } from '../../shared/pipes/validation.pipe';
+import { LoginDto } from './dto/login.dto';
 
 @Controller()
 export class AuthController {
-    constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
-    @Post('login')
-    public async login(@Body() body, @Res() res) {
-        if (!body) throw new MessageCodeError('auth:login:missingInformation');
-        if (!body.email) throw new MessageCodeError('auth:login:missingEmail');
-        if (!body.password) throw new MessageCodeError('auth:login:missingPassword');
-
-        const token = await this.authService.sign(body);
-        res.status(HttpStatus.ACCEPTED).json('Bearer ' + token);
-    }
+    @Post('sign-in')
+    @UsePipes(ValidationPipe)
+  public async login(@Body() body: LoginDto, @Res() res) {
+    const token = await this.authService.sign(body);
+    res.status(HttpStatus.ACCEPTED).json(`Bearer ${token}`);
+  }
 }

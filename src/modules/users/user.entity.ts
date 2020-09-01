@@ -11,6 +11,7 @@ import {
   BeforeCreate,
 } from 'sequelize-typescript';
 import { MessageCodeError } from '../../shared/errors';
+import { UserStatusEnum } from '../../shared/enums/user-status.enum';
 
 @Table({ timestamps: true, tableName: 'users' })
 export class User extends Model<User> {
@@ -34,6 +35,14 @@ export class User extends Model<User> {
       allowNull: false,
     })
     public lastName: string;
+
+    @Column({
+      type: DataType.CHAR(30),
+      allowNull: false,
+      values: Object.values(UserStatusEnum),
+      defaultValue: UserStatusEnum.ACTIVE,
+    })
+    public status: string;
 
     @Column({
       type: DataType.CHAR(100),
