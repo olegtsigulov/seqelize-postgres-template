@@ -3,35 +3,37 @@ import { MessageCodeError } from '../../shared/errors';
 import { IUserService } from './interfaces';
 import { User } from './user.entity';
 import { UserDto } from './dto';
+import { DatabaseProvidesEnum } from '../../shared/enums/database-provides.enum';
 
 @Injectable()
 export class UserService implements IUserService {
   constructor(
-        @Inject('UserRepository') private readonly userRepository: typeof User,
-        @Inject('SequelizeInstance') private readonly sequelizeInstance,
+        @Inject(DatabaseProvidesEnum.userRepository) private readonly userRepository: typeof User,
+        @Inject(DatabaseProvidesEnum.databaseInstance) private readonly sequelizeInstance,
   ) {}
 
   public async findAll(): Promise<Array<User>> {
     return this.userRepository.findAll<User>();
   }
 
-  public async findOne(options: Object): Promise<User | null> {
+  public async findOneWithPassword(options: Object): Promise<User | null> {
     return this.userRepository.findOne<User>(options);
   }
 
+  public async findOne(options: Object): Promise<User | null> {
+    return this.userRepository.findOne<User>({ ...options, attributes: { exclude: ['hash'] } });
+  }
+
   public async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne<User>({ where: { email } });
+    return this.userRepository.findOne<User>({ where: { email }, attributes: { exclude: ['hash'] } });
   }
 
   public async findById(id: number): Promise<User | null> {
-    return this.userRepository.findOne<User>({ where: { id } });
+    return this.userRepository.findOne<User>({ where: { id }, attributes: { exclude: ['hash'] } });
   }
 
   public async create(user: UserDto): Promise<User> {
-    return this.sequelizeInstance.transaction(async (transaction) => this.userRepository.create<User>(user, {
-      validate: true,
-      transaction,
-    }));
+    return this.userRepository.create(user);
   }
 
   public async update(id: number, newValue: UserDto): Promise<User | null> {
@@ -48,7 +50,7 @@ export class UserService implements IUserService {
   }
 
   public async delete(id: number): Promise<void> {
-    return this.sequelizeInstance.transaction(async (transaction) => await this.userRepository.destroy({
+    return this.sequelizeInstance.transaction(async (transaction) => this.userRepository.destroy({
       where: { id },
       transaction,
     }));

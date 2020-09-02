@@ -1,27 +1,18 @@
 import { Sequelize } from 'sequelize-typescript';
-import { databaseConfig } from '../../shared';
+import * as dotenv from 'dotenv';
 import { User } from '../users/user.entity';
+import { configService } from '../../shared/config/configService';
+import { DatabaseProvidesEnum } from '../../shared/enums/database-provides.enum';
+
+dotenv.config({ path: `.env/${process.env.NODE_ENV || 'development'}.env` });
 
 export const databaseProvider = {
-  provide: 'SequelizeInstance',
-  useFactory: () => {
-    let config;
-    switch (process.env.NODE_ENV) {
-      case 'prod':
-      case 'production':
-        config = databaseConfig.production;
-        break;
-      case 'dev':
-      case 'development':
-        config = databaseConfig.development;
-        break;
-      default:
-        config = databaseConfig.development;
-        break;
-    }
-
+  provide: DatabaseProvidesEnum.databaseInstance,
+  useFactory: async () => {
+    const config = configService.getDatabaseConfig();
     const sequelize = new Sequelize(config);
     sequelize.addModels([User]);
+    // await sequelize.sync({ logging: true, force: false });
     /* await sequelize.sync(); add this if you want to sync model and DB. */
     return sequelize;
   },

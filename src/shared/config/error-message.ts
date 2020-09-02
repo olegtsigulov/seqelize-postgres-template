@@ -2,65 +2,11 @@ import { HttpStatus } from '@nestjs/common';
 import { IErrorMessages } from './interfaces/error-message.interface';
 
 export const errorMessagesConfig: { [messageCode: string]: IErrorMessages } = {
-  'user:create:missingInformation': {
-    type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to create a new user with missing information.',
-    userMessage: 'Impossible de créer un utilisateur avec des données manquantes.',
-  },
-  'user:create:missingFirstName': {
-    type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to create a new user without first name.',
-    userMessage: 'Veuillez indiquer votre prénom.',
-  },
   'user:banned': {
     type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
+    httpStatus: HttpStatus.FORBIDDEN,
     errorMessage: 'User in black list',
     userMessage: 'Sorry, you have been banned by administrator',
-  },
-  'user:create:missingEmail': {
-    type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to create a new user without email.',
-    userMessage: 'Veuillez indiquer votre adresse e-mail.',
-  },
-  'user:create:missingPassword': {
-    type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to create a new user without password.',
-    userMessage: 'Veuillez indiquer votre mot de passe.',
-  },
-  'user:create:emailAlreadyExist': {
-    type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to create a new user with this email.',
-    userMessage: "L'adresse e-mail que vous avez fourni est déjà utilisé.",
-  },
-  'user:show:missingId': {
-    type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to find the user caused by missing information.',
-    userMessage: "Impossible de trouver un utilisateur sans fournir d'id.",
-  },
-  'user:update:missingInformation': {
-    type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to update the user caused by missing information.',
-    userMessage: "Impossible de mettre à jour l'utilisateur avec des données manquantes.",
-  },
-  'user:update:missingId': {
-    type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to update the user caused by missing information.',
-    userMessage: "Impossible de mettre à jour l'utilisateur avec des données manquantes.",
-  },
-  'user:delete:missingId': {
-    type: 'BadRequest',
-    httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to delete the user caused by missing information.',
-    userMessage: "Impossible de supprimer un utilisateur sans fournir d'id.",
   },
   'user:notFound': {
     type: 'notFound',
@@ -72,7 +18,7 @@ export const errorMessagesConfig: { [messageCode: string]: IErrorMessages } = {
     type: 'unauthorized',
     httpStatus: HttpStatus.UNAUTHORIZED,
     errorMessage: 'Access unauthorized.',
-    userMessage: 'Accès non autorisé.',
+    userMessage: 'Token missing or not valid',
   },
   'auth:login:missingCredentials': {
     type: 'BadRequest',
@@ -80,10 +26,16 @@ export const errorMessagesConfig: { [messageCode: string]: IErrorMessages } = {
     errorMessage: 'Unable to connect the user without email or password',
     userMessage: 'Missing email or password',
   },
-  'auth:login:missingPassword': {
+  'auth:login:invalidCredentials': {
     type: 'BadRequest',
     httpStatus: HttpStatus.BAD_REQUEST,
-    errorMessage: 'Unable to connect the user without password.',
-    userMessage: 'Veuillez indiquer votre mot de passe.',
+    errorMessage: 'Unable to connect the user, wrong email or password',
+    userMessage: 'Wrong email or password',
+  },
+  'validation:error': {
+    type: 'ValidationError',
+    httpStatus: HttpStatus.BAD_REQUEST,
+    errorMessage: 'Validation error',
+    userMessage: 'Validation error: ',
   },
 };

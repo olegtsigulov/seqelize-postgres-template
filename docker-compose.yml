@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  main:
+    container_name: sequelize-auth-template
+    build: .
+    ports:
+      - ${PORT}:${PORT}
+    command: npm run start:prod
+    networks:
+      - sequelizeWebnet
+    depends_on:
+      - redis
+    env_file:
+      - .env/production.env
+  redis:
+    container_name: redisMain
+    image: redis:5
+    volumes:
+      - redisdb:/data
+    networks:
+      - sequelizeWebnet
+    env_file:
+      - .env/production.env
+
+networks:
+  sequelizeWebnet:
+volumes:
+  redisdb:

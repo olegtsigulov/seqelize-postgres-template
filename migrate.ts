@@ -6,7 +6,7 @@ import * as Promise from 'bluebird';
 import { Sequelize } from 'sequelize-typescript';
 import { databaseConfig } from './src/shared';
 
-dotenv.config();
+dotenv.config({ path: `.env/${process.env.NODE_ENV || 'development'}.env` });
 
 const Umzug = require('umzug');
 

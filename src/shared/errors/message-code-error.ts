@@ -6,10 +6,10 @@ export class MessageCodeError extends Error {
     public httpStatus: number;
     public errorMessage: string;
 
-    constructor(messageCode: string) {
+    constructor(messageCode: string, errorBody?: string) {
       super();
 
-      const errorMessageConfig = this.getMessageFromMessageCode(messageCode);
+      const errorMessageConfig = this.getMessageFromMessageCode(messageCode, errorBody);
       if (!errorMessageConfig) throw new Error('Unable to find message code error.');
 
       Error.captureStackTrace(this, this.constructor);
@@ -23,13 +23,15 @@ export class MessageCodeError extends Error {
     /**
      * @description: Find the error config by the given message code.
      * @param {string} messageCode
+     * @param {string | undefined} customBody
      * @return {IErrorMessages}
      */
-    private getMessageFromMessageCode(messageCode: string): IErrorMessages {
+    private getMessageFromMessageCode(messageCode: string, customBody?: string): IErrorMessages {
       let errorMessageConfig: IErrorMessages | undefined;
       Object.keys(errorMessagesConfig).some((key) => {
         if (key === messageCode) {
           errorMessageConfig = errorMessagesConfig[key];
+          if (customBody) errorMessageConfig.userMessage += customBody;
           return true;
         }
         return false;

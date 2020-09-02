@@ -9,12 +9,11 @@ import { usersProvider } from './user.provider';
 @Module({
   imports: [DatabaseModule],
   controllers: [UserController],
-  providers: [UserService, usersProvider]
+  providers: [UserService, usersProvider],
 })
 
-
 export class UserModule {
-  /**Middlewares*/
+  /** Middlewares */
   // public configure(consumer: MiddlewareConsumer) {
   //   consumer
   //       .apply(AuthMiddleware)
