@@ -31,6 +31,6 @@ export class DispatchError implements ExceptionFilter {
       return res.status(HttpStatus.UNAUTHORIZED).send();
     }
 
-    return res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).send(err.response);
+    return res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR).send({ message: err.response || err.message });
   }
 }

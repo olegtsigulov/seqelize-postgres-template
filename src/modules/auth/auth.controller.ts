@@ -14,6 +14,7 @@ import { ProvidersEnum } from './enum/providers.enum';
 import { JwtRefreshGuard } from '../../shared/guards/auth/jwt-refresh.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../../shared';
+import { ProviderUserData } from './dto/provider-user-data.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -117,6 +118,7 @@ export class AuthController {
     type: UserDto,
   })
   @UseGuards(OAuthGuard)
+  @UsePipes(ValidationPipe)
   async facebookSignIn(@Req() req, @Res() res) {
     const { user, newUser } = await this.authService.socialSign(req.userInfo, res);
     res.status(newUser ? HttpStatus.CREATED : HttpStatus.OK).json(user);
