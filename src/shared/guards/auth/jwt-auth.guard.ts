@@ -29,7 +29,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         where: { id: decoded.id, providerId: decoded.providerId },
       });
       if (!user) throw new MessageCodeError('request:unauthorized');
-      if (user.lastTimePasswordUpdate && user.lastTimePasswordUpdate < decoded.iat) {
+      if (user.lastTimePasswordUpdate && user.lastTimePasswordUpdate > decoded.iat) {
         throw new MessageCodeError('request:unauthorized');
       }
       return true;

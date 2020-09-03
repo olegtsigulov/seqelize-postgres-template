@@ -6,7 +6,6 @@ import { AuthController } from './auth.controller';
 import { configService } from '../../shared/config/configService';
 import { UserModule } from '../users/user.module';
 import { UserService } from '../users/user.service';
-import { usersProvider } from '../users/user.provider';
 import { DatabaseModule } from '../database/database.module';
 import { OauthStrategy } from './strategies/oauth.strategy';
 
@@ -19,7 +18,6 @@ import { OauthStrategy } from './strategies/oauth.strategy';
       signOptions: { expiresIn: configService.getJwtExpiration() },
     })],
   providers: [
-    usersProvider,
     PassportModule,
     AuthService,
     UserService,
