@@ -21,7 +21,7 @@ export class UserService implements IUserService {
   }
 
   public async findOne(options: Object): Promise<User | null> {
-    return this.userRepository.findOne<User>({ ...options, attributes: { exclude: ['hash'] } });
+    return this.userRepository.findOne<User>({ ...options, attributes: { exclude: ['hash'] }, raw: true });
   }
 
   public async findByEmail(email: string): Promise<User | null> {
@@ -33,20 +33,27 @@ export class UserService implements IUserService {
   }
 
   public async create(user: UserDto): Promise<User> {
-    return this.userRepository.create(user);
+    return this.sequelizeInstance.transaction(async (transaction) => this.userRepository.create<User>(user, {
+      validate: true,
+      transaction,
+    }));
   }
+  // public async create(user: UserDto): Promise<User> {
+  //   return this.userRepository.create(user);
+  // }
 
-  public async update(id: number, newValue: UserDto): Promise<User | null> {
-    return this.sequelizeInstance.transaction(async (transaction) => {
-      let user = await this.userRepository.findOne<User>({ where: { id }, transaction });
-      if (!user) throw new MessageCodeError('user:notFound');
-
-      user = this._assign(user, newValue);
-      return user.save({
-        validate: true,
-        transaction,
-      });
-    });
+  public async update(id: number, updateValues: Object): Promise<User | null> {
+    return this.userRepository.update<User>(updateValues, { where: { id } });
+    // return this.sequelizeInstance.transaction(async (transaction) => {
+    //   let user = await this.userRepository.findOne<User>({ where: { id }, transaction, raw: true });
+    //   if (!user) throw new MessageCodeError('user:notFound');
+    //
+    //   user = this._assign(user, newValue);
+    //   return user.save({
+    //     validate: true,
+    //     transaction,
+    //   });
+    // });
   }
 
   public async delete(id: number): Promise<void> {

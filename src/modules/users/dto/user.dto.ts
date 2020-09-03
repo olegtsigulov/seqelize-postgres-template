@@ -10,19 +10,22 @@ export class UserDto {
     provider: string;
 
     @ApiPropertyOptional({ description: 'User name', example: 'Ivan' })
-    firstName: string;
+    firstName?: string;
 
     @ApiPropertyOptional({ description: 'User second name', example: 'Ivanov' })
-    lastName: string;
+    lastName?: string;
 
     @ApiProperty({ description: 'User email', example: 'user@gmail.com' })
     email: string;
 
-    @ApiPropertyOptional({ description: 'User provider id', example: '1343455634224' })
-    providerId?: string;
+    @ApiProperty({ description: 'User provider id', example: '1343455634224' })
+    providerId: string;
 
     hash?: string;
 
     @ApiPropertyOptional({ description: 'User status', enum: UserStatusEnum, example: UserStatusEnum.ACTIVE })
     status?: string;
+
+    @ApiPropertyOptional({ description: 'Timestamp when local user change password', example: 12354522 })
+    lastTimePasswordUpdate?: number
 }

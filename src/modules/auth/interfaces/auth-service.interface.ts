@@ -2,6 +2,7 @@ import { Algorithm } from 'jsonwebtoken';
 import { Response } from 'express';
 import { ProviderUserData } from '../dto/provider-user-data.dto';
 import { UserDto } from '../../users/dto';
+import { CreateLocalUserDto } from '../dto/create-local-user.dto';
 
 export interface IAuthService {
     accessOptions: IJwtOptions;
@@ -14,6 +15,7 @@ export interface IAuthService {
      * @return {Promise<string>}
      */
     localLogin(credentials: { email: string; password: string }, res: Response): Promise<UserDto>;
+    localSignUp(userData: CreateLocalUserDto, res: Response): Promise<UserDto>;
     socialSign(userData: ProviderUserData, res: Response): Promise<{user:UserDto, newUser: boolean}>;
     tokenSign(userData: UserDto, res: Response): Promise<void>;
 }

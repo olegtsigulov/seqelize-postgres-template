@@ -47,12 +47,14 @@ export class User extends Model<User> {
       type: DataType.ENUM(),
       values: Object.values(ProvidersEnum),
       defaultValue: ProvidersEnum.GOOGLE,
+      unique: 'unique',
     })
     public provider: string;
 
     @Column({
       type: DataType.STRING,
-      allowNull: true,
+      allowNull: false,
+      unique: 'unique',
     })
     public providerId: string;
 
@@ -67,6 +69,12 @@ export class User extends Model<User> {
       allowNull: true,
     })
     public hash: string;
+
+    @Column({
+      type: DataType.INTEGER,
+      allowNull: true,
+    })
+    public lastTimePasswordUpdate: number;
 
     @CreatedAt public createdAt: Date;
 

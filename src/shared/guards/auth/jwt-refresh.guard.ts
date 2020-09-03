@@ -14,7 +14,7 @@ export class JwtRefreshGuard implements CanActivate {
       const decoded: any = jwt.verify(token, process.env.JWT_REFRESH_KEY);
 
       const user = await this.userService.findOne({
-        where: { id: decoded.id, email: decoded.email },
+        where: { id: decoded.id, providerId: decoded.providerId },
       });
       if (!user) throw new MessageCodeError('request:unauthorized');
       req.userInfo = user;

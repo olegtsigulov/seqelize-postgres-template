@@ -1,5 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
 import { omit } from 'lodash';
+import * as moment from 'moment';
 import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
@@ -13,6 +14,7 @@ import { configService } from '../../shared/config/configService';
 import { UserDto } from '../users/dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ProvidersEnum } from './enum/providers.enum';
+import { CreateLocalUserDto } from './dto/create-local-user.dto';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -55,23 +57,46 @@ export class AuthService implements IAuthService {
     const user = await this.getLocalUser(credentials);
 
     await this.tokenSign(user, res);
-    return user;
+    return omit(user, ['hash']);
   }
 
   /** Local user change password */
-  public async changePassword(body: ChangePasswordDto): Promise<UserDto> {
+  public async changePassword(body: ChangePasswordDto, res: Response): Promise<UserDto> {
     const user = await this.getLocalUser({ password: body.oldPassword, email: body.email });
 
-    const updatedUser = this.userService.update(user.id,
-      Object.assign(user, { hash: this.hashPassword(body.newPassword) }));
-    return omit(updatedUser, ['hash']);
+    await this.userService.update(user.id,
+      {
+        hash: this.hashData(body.newPassword),
+        lastTimePasswordUpdate: Math.round(moment.utc().valueOf() / 1000),
+      });
+    await this.tokenSign(user, res);
+    return omit(user, ['hash']);
   }
 
+  /** Social user registration */
+  public async localSignUp(
+    userParams:CreateLocalUserDto, res: Response,
+  ): Promise<UserDto> {
+    const hash = this.hashData(userParams.password);
+    const providerId = this.hashData(userParams.email);
+    const user = await this.userService.create({
+      hash,
+      email: userParams.email,
+      firstName: userParams.firstName,
+      lastName: userParams.lastName,
+      provider: ProvidersEnum.LOCAL,
+      providerId,
+    });
+    await this.tokenSign(user, res);
+    return omit(user.toJSON(), ['hash']);
+  }
   /** Social user authorization */
   async socialSign(userData: ProviderUserData, res: Response)
       : Promise<{user:UserDto, newUser: boolean}> {
     let newUser = false;
-    let user = await this.userService.findByEmail(userData.email);
+    let user = await this.userService.findOne(
+      { where: { provider: userData.provider, providerId: userData.id } },
+    );
 
     if (!user) {
       newUser = true;
@@ -95,19 +120,17 @@ export class AuthService implements IAuthService {
   private getJWTPayload(user: UserDto): JwtPayloadDto {
     return {
       id: user.id,
-      email: user.email,
+      providerId: user.providerId,
     };
   }
 
   /** Validate local user and return userData */
   private async getLocalUser(credentials:{ email: string, password: string }): Promise<UserDto> {
-    const hash = this.hashPassword(credentials.password);
+    const hash = this.hashData(credentials.password);
+    const providerId = this.hashData(credentials.email);
 
     const user = await this.userService.findOneWithPassword({
-      where: {
-        provider: ProvidersEnum.LOCAL,
-        email: credentials.email,
-      },
+      where: { provider: ProvidersEnum.LOCAL, providerId }, raw: true,
     });
     if (!user) throw new MessageCodeError('user:notFound');
     if (user.hash !== hash) throw new MessageCodeError('auth:login:invalidCredentials');
@@ -115,7 +138,7 @@ export class AuthService implements IAuthService {
     return user;
   }
 
-  private hashPassword(password: string): string {
+  private hashData(password: string): string {
     const id = crypto.createHmac('sha256', process.env.SECRET);
     id.update(password);
     return id.digest('hex');

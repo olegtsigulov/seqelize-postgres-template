@@ -2,6 +2,7 @@ import {
   Body, Controller, HttpStatus, Post, Req, Res, UseGuards, UsePipes,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody, ApiHeader, ApiResponse, ApiTags,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
@@ -14,12 +15,35 @@ import { ProvidersEnum } from './enum/providers.enum';
 import { JwtRefreshGuard } from '../../shared/guards/auth/jwt-refresh.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../../shared';
-import { ProviderUserData } from './dto/provider-user-data.dto';
+import { CreateLocalUserDto } from './dto/create-local-user.dto';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  /** --------------------LOCAL SIGN UP ----------------------------- */
+  @Post('local/sign-up')
+  @Provider(ProvidersEnum.LOCAL)
+  @ApiBody({
+    type: CreateLocalUserDto,
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Local user created.',
+    type: UserDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description:
+        'Forbidden to authorize. You have been banned by administrator.',
+  })
+  @UsePipes(ValidationPipe)
+  public async localSignUp(@Body() body: CreateLocalUserDto, @Res() res) {
+    const user = await this.authService.localSignUp(body, res);
+    res.status(HttpStatus.CREATED).json(user);
+  }
 
   /** --------------------LOCAL SIGN IN ----------------------------- */
     @Post('local/sign-in')
@@ -61,9 +85,10 @@ export class AuthController {
     description: 'Forbidden to change password. You have been banned by administrator.',
   })
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @UsePipes(ValidationPipe)
     public async changePassword(@Body() body: ChangePasswordDto, @Res() res) {
-      const result = await this.authService.changePassword(body);
+      const result = await this.authService.changePassword(body, res);
       res.status(HttpStatus.OK).json({ result });
     }
 

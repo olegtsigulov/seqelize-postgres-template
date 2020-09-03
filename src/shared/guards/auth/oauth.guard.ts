@@ -1,9 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import * as jf from 'joiful';
 import { OauthStrategy } from 'src/modules/auth/strategies/oauth.strategy';
 import { ProviderUserData } from 'src/modules/auth/dto/provider-user-data.dto';
-import { MessageCodeError } from '../../errors';
 
 @Injectable()
 export class OAuthGuard implements CanActivate {
@@ -25,9 +23,7 @@ export class OAuthGuard implements CanActivate {
       next,
       provider,
     );
-    const { error, value } = jf.validateAsClass(providerUserInfo, ProviderUserData);
-    if (error) throw new MessageCodeError('validation:error', error.message);
-    req.userInfo = value;
+    req.userInfo = providerUserInfo;
 
     return !!req.userInfo;
   }

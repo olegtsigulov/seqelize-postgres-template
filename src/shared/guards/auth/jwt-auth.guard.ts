@@ -26,9 +26,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       }
 
       const user = await this.userService.findOne({
-        where: { id: decoded.id, email: decoded.email },
+        where: { id: decoded.id, providerId: decoded.providerId },
       });
       if (!user) throw new MessageCodeError('request:unauthorized');
+      if (user.lastTimePasswordUpdate && user.lastTimePasswordUpdate < decoded.iat) {
+        throw new MessageCodeError('request:unauthorized');
+      }
       return true;
     }
     throw new MessageCodeError('request:unauthorized');

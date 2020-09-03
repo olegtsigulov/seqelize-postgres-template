@@ -12,7 +12,7 @@ export const databaseProvider = {
     const config = configService.getDatabaseConfig();
     const sequelize = new Sequelize(config);
     sequelize.addModels([User]);
-    // await sequelize.sync({ logging: true, force: false });
+    await sequelize.sync({ logging: true, force: false });
     /* await sequelize.sync(); add this if you want to sync model and DB. */
     return sequelize;
   },
