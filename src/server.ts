@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
+import * as Sentry from '@sentry/node';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as helmet from 'helmet';
 import { DispatchError } from './shared';
@@ -16,7 +17,10 @@ async function bootstrap() {
   });
   app.setGlobalPrefix('api');
   app.use(helmet());
-
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 1.0,
+  });
   const options = new DocumentBuilder()
     .setTitle('Example Project REST Docs')
     .setDescription('REST docs for Example Project Api')

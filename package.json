@@ -36,6 +36,8 @@
     "@nestjs/sequelize": "^0.1.0",
     "@nestjs/swagger": "^4.6.0",
     "bluebird": "^3.7.2",
+    "@sentry/minimal": "^5.22.3",
+    "@sentry/node": "^5.9.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "helmet": "^4.1.0",
