@@ -2,10 +2,11 @@ import * as dotenv from 'dotenv';
 import { NestFactory } from '@nestjs/core';
 import * as Sentry from '@sentry/node';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import * as helmet from 'helmet';
+import helmet from 'helmet';
 import { DispatchError } from './shared';
 import { AppModule } from './app.module';
 import { configService } from './shared/config/configService';
+import { AdminPanelPlugin } from './modules/admin-panel/admin-panel.plugin';
 
 dotenv.config({ path: `.env/${process.env.NODE_ENV || 'development'}.env` });
 
@@ -17,6 +18,7 @@ async function bootstrap() {
   });
   app.setGlobalPrefix('api');
   app.use(helmet());
+  await AdminPanelPlugin.setupAdminPanel(app);
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     tracesSampleRate: 1.0,
