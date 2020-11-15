@@ -2,7 +2,7 @@ import { INestApplication, Injectable } from '@nestjs/common';
 import AdminBro from 'admin-bro';
 import * as AdminBroExpress from 'admin-bro-expressjs';
 import * as AdminBroSequelize from 'admin-bro-sequelizejs';
-import { User } from '../users/user.entity';
+import { User } from '../database/entities/user.entity';
 
 @Injectable()
 export class AdminPanelPlugin {

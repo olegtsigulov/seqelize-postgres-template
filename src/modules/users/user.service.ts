@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MessageCodeError } from '../../shared/errors';
 import { IUserService } from './interfaces';
-import { User } from './user.entity';
+import { User } from '../database/entities/user.entity';
 import { UserDto } from './dto';
 import { DatabaseProvidesEnum } from '../../shared/enums/database-provides.enum';
 
@@ -16,11 +16,13 @@ export class UserService implements IUserService {
     return this.userRepository.findAll<User>();
   }
 
-  public async findOneWithPassword(options: Object): Promise<User | null> {
-    return this.userRepository.findOne<User>(options);
+  public async findOneWithPassword(options: Record<string, any>): Promise<User | null> {
+    const user = await this.userRepository.findOne<User>(options);
+    if (user) return user.get({ plain: true });
+    return user;
   }
 
-  public async findOne(options: Object): Promise<User | null> {
+  public async findOne(options: Record<string, any>): Promise<User | null> {
     return this.userRepository.findOne<User>({ ...options, attributes: { exclude: ['hash'] }, raw: true });
   }
 

@@ -4,12 +4,11 @@ import { DatabaseModule } from '../database/database.module';
 // import { AuthMiddleware } from '../../shared/index';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
-import { usersProvider } from './user.provider';
 
 @Module({
   imports: [DatabaseModule],
   controllers: [UserController],
-  providers: [UserService, usersProvider],
+  providers: [UserService],
 })
 
 export class UserModule {

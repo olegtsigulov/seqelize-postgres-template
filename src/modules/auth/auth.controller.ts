@@ -1,9 +1,9 @@
 import {
-  Body, Controller, HttpStatus, Post, Req, Res, UseGuards, UsePipes,
+  Body, Controller, Get, HttpStatus, Post, Put, Query, Req, Res, UseGuards, UsePipes,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  ApiBody, ApiHeader, ApiResponse, ApiTags,
+  ApiBody, ApiHeader, ApiOperation, ApiResponse, ApiTags,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { ValidationPipe } from '../../shared/pipes/validation.pipe';
@@ -16,6 +16,8 @@ import { JwtRefreshGuard } from '../../shared/guards/auth/jwt-refresh.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../../shared';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
+import {ForgotPasswordDto} from "./dto/forgot-password.dto";
+import {SetNewPasswordDto} from "./dto/set-new-password.dto";
 
 @ApiTags('auth')
 @Controller('auth')
@@ -92,6 +94,41 @@ export class AuthController {
       res.status(HttpStatus.OK).json({ result });
     }
 
+  /** ----------------FORGOT PASSWORD--------------------------------*/
+  @Get('forgot-password')
+  @ApiOperation({
+    summary: 'Send confirmation to email for restore user password',
+    description: 'Restore user password by email, '
+        + 'restore only active roles users, send confirmation to email',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Confirmation sent',
+    schema: { example: { result: true } },
+  })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @UsePipes(ValidationPipe)
+  public async forgotPassword(@Query() query: ForgotPasswordDto, @Res() res) {
+    const result = await this.authService.forgotPassword(query.email);
+    res.status(HttpStatus.OK).json({ result });
+  }
+
+  @Put('forgot-password')
+  @ApiOperation({
+    summary: 'Restore user password',
+    description: 'Save new user password',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Password updated',
+    type: UserDto,
+  })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @UsePipes(ValidationPipe)
+  public async setNewPassword(@Body() body: SetNewPasswordDto, @Res() res) {
+    const result = await this.authService.saveNewPassword(body, res);
+    res.status(HttpStatus.OK).json({ result });
+  }
   /** --------------------GOOGLE SIGN ------------------------------- */
   @Post('google/sign-in')
   @Provider(ProvidersEnum.GOOGLE)

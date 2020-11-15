@@ -9,9 +9,9 @@ import {
   BeforeValidate,
   BeforeCreate,
 } from 'sequelize-typescript';
-import { MessageCodeError } from '../../shared/errors';
-import { UserStatusEnum } from '../../shared/enums/user-status.enum';
-import { ProvidersEnum } from '../auth/enum/providers.enum';
+import { MessageCodeError } from '../../../shared/errors';
+import { UserStatusEnum } from '../../../shared/enums/user-status.enum';
+import { ProvidersEnum } from '../../auth/enum/providers.enum';
 
 @Table({ timestamps: true, tableName: 'users' })
 export class User extends Model<User> {

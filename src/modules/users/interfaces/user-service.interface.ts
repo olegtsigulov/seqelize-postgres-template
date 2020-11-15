@@ -1,4 +1,4 @@
-import { User } from '../user.entity';
+import { User } from '../../database/entities/user.entity';
 import { UserDto } from '../dto';
 
 export interface IUserService {

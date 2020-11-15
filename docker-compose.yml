@@ -12,7 +12,7 @@ services:
     depends_on:
       - redis
     env_file:
-      - .env/production.env
+      - ..env/production..env
   redis:
     container_name: redisMain
     image: redis:5
@@ -21,7 +21,7 @@ services:
     networks:
       - sequelizeWebnet
     env_file:
-      - .env/production.env
+      - ..env/production..env
 
 networks:
   sequelizeWebnet:

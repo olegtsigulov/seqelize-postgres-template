@@ -1,5 +1,6 @@
 import { JwtService } from '@nestjs/jwt';
-import { omit } from 'lodash';
+import { omit, find } from 'lodash';
+import * as jwt from 'jsonwebtoken';
 import * as moment from 'moment';
 import * as crypto from 'crypto';
 import { Injectable } from '@nestjs/common';
@@ -15,11 +16,22 @@ import { UserDto } from '../users/dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ProvidersEnum } from './enum/providers.enum';
 import { CreateLocalUserDto } from './dto/create-local-user.dto';
+import { SetNewPasswordDto } from './dto/set-new-password.dto';
+import { MailerService } from '../mailer/mailer.service';
 
 @Injectable()
 export class AuthService implements IAuthService {
-  constructor(private readonly userService: UserService, private jwtService: JwtService) {
+  constructor(private readonly userService: UserService,
+              private jwtService: JwtService,
+              private readonly mailerService: MailerService) {
   }
+
+  private _forgotOptions: IJwtOptions = {
+    algorithm: 'HS256',
+    expiresIn: configService.getJwtExpiration(),
+    jwtid: process.env.JWT_ID || '',
+    secret: process.env.FORGOT_HASH,
+  };
 
     private _accessOptions: IJwtOptions = {
       algorithm: 'HS256',
@@ -56,7 +68,7 @@ export class AuthService implements IAuthService {
       : Promise<UserDto> {
     const user = await this.getLocalUser(credentials);
 
-    await this.tokenSign(user, res);
+    this.tokenSign(user, res);
     return omit(user, ['hash']);
   }
 
@@ -69,7 +81,7 @@ export class AuthService implements IAuthService {
         hash: this.hashData(body.newPassword),
         lastTimePasswordUpdate: Math.round(moment.utc().valueOf() / 1000),
       });
-    await this.tokenSign(user, res);
+    this.tokenSign(user, res);
     return omit(user, ['hash']);
   }
 
@@ -87,7 +99,7 @@ export class AuthService implements IAuthService {
       provider: ProvidersEnum.LOCAL,
       providerId,
     });
-    await this.tokenSign(user, res);
+    this.tokenSign(user, res);
     return omit(user.toJSON(), ['hash']);
   }
   /** Social user authorization */
@@ -104,12 +116,46 @@ export class AuthService implements IAuthService {
     }
     if (user.status === UserStatusEnum.BANNED) throw new MessageCodeError('user:banned');
 
-    await this.tokenSign(user, res);
+    this.tokenSign(user, res);
     return { user, newUser };
   }
 
+  /** user forgot password */
+  public async forgotPassword(email: string):Promise<boolean> {
+    const user = await this.userService.findOne({ where: { email } });
+    if (!user) throw new MessageCodeError('user:notFound');
+
+    const token = this.jwtService.sign(this.getJWTPayload(user), this._forgotOptions);
+
+    await this.mailerService.sendForgotPassword(
+      email,
+      `${process.env.MAIN_LINK}/recovery-password?id=${token}`,
+    );
+    return true;
+  }
+
+  public async saveNewPassword(body: SetNewPasswordDto, res: Response) {
+    try {
+      jwt.verify(body.id, process.env.FORGOT_HASH);
+    } catch (e) {
+      throw new MessageCodeError('request:unauthorized');
+    }
+
+    const decoded: any = jwt.decode(body.id);
+    const user = await this.userService.findOne({ where: { email: decoded.email } });
+    if (!user) throw new MessageCodeError('user:notFound');
+
+    await this.userService.update(user.id,
+      {
+        hash: this.hashData(body.password),
+        lastTimePasswordUpdate: Math.round(moment.utc().valueOf() / 1000),
+      });
+    this.tokenSign(user, res);
+    return user.get({ plain: true });
+  }
+
   /** Add access and refresh token to headers */
-  async tokenSign(user: UserDto, res: Response) {
+  tokenSign(user: UserDto, res: Response) {
     const payload = this.getJWTPayload(user);
     res.set('access_token', `Bearer ${this.jwtService.sign(payload, this._accessOptions)}`);
     res.set('refresh_token', `Bearer ${this.jwtService.sign(payload, this._refreshOptions)}`);
@@ -130,7 +176,7 @@ export class AuthService implements IAuthService {
     const providerId = this.hashData(credentials.email);
 
     const user = await this.userService.findOneWithPassword({
-      where: { provider: ProvidersEnum.LOCAL, providerId }, raw: true,
+      where: { provider: ProvidersEnum.LOCAL, providerId },
     });
     if (!user) throw new MessageCodeError('user:notFound');
     if (user.hash !== hash) throw new MessageCodeError('auth:login:invalidCredentials');

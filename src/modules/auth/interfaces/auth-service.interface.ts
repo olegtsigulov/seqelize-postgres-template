@@ -17,7 +17,7 @@ export interface IAuthService {
     localLogin(credentials: { email: string; password: string }, res: Response): Promise<UserDto>;
     localSignUp(userData: CreateLocalUserDto, res: Response): Promise<UserDto>;
     socialSign(userData: ProviderUserData, res: Response): Promise<{user:UserDto, newUser: boolean}>;
-    tokenSign(userData: UserDto, res: Response): Promise<void>;
+    tokenSign(userData: UserDto, res: Response): void;
 }
 
 export interface IJwtOptions {

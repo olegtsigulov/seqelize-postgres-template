@@ -1,7 +1,7 @@
-import { User } from './user.entity';
 import { DatabaseProvidesEnum } from '../../shared/enums/database-provides.enum';
+import { User } from './entities';
 
-export const usersProvider = {
+export const entitiesProviders = [{
   provide: DatabaseProvidesEnum.userRepository,
   useValue: User,
-};
+}];

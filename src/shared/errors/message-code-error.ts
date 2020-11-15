@@ -5,8 +5,10 @@ export class MessageCodeError extends Error {
     public messageCode: string;
     public httpStatus: number;
     public errorMessage: string;
+    public errorData: any;
 
-    constructor(messageCode: string, errorBody?: string) {
+    constructor(messageCode: string, errorBody?: string,
+      errorData?: Record<string, any>|Record<string, any>[]) {
       super();
 
       const errorMessageConfig = this.getMessageFromMessageCode(messageCode, errorBody);
@@ -18,6 +20,7 @@ export class MessageCodeError extends Error {
       this.messageCode = messageCode;
       this.errorMessage = errorMessageConfig.errorMessage;
       this.message = errorMessageConfig.userMessage;
+      this.errorData = errorData;
     }
 
     /**

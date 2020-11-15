@@ -8,9 +8,11 @@ import { UserModule } from '../users/user.module';
 import { UserService } from '../users/user.service';
 import { DatabaseModule } from '../database/database.module';
 import { OauthStrategy } from './strategies/oauth.strategy';
+import { MailerModule } from '../mailer/mailer.module';
 
 @Module({
   imports: [
+    MailerModule,
     DatabaseModule,
     UserModule,
     JwtModule.register({

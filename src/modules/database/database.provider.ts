@@ -1,6 +1,6 @@
 import { Sequelize } from 'sequelize-typescript';
 import * as dotenv from 'dotenv';
-import { User } from '../users/user.entity';
+import { User } from './entities/user.entity';
 import { configService } from '../../shared/config/configService';
 import { DatabaseProvidesEnum } from '../../shared/enums/database-provides.enum';
 

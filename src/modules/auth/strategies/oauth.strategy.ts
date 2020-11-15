@@ -1,6 +1,6 @@
-import * as passport from 'passport';
+import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-token';
-import * as FacebookStrategy from 'passport-facebook-token';
+import FacebookStrategy from 'passport-facebook-token';
 import { Injectable } from '@nestjs/common';
 import { configService } from '../../../shared/config/configService';
 import { ProviderUserData } from '../dto/provider-user-data.dto';
