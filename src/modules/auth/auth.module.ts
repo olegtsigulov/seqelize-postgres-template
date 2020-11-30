@@ -5,7 +5,6 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { configService } from '../../shared/config/configService';
 import { UserModule } from '../users/user.module';
-import { UserService } from '../users/user.service';
 import { DatabaseModule } from '../database/database.module';
 import { OauthStrategy } from './strategies/oauth.strategy';
 import { MailerModule } from '../mailer/mailer.module';
@@ -22,7 +21,6 @@ import { MailerModule } from '../mailer/mailer.module';
   providers: [
     PassportModule,
     AuthService,
-    UserService,
     OauthStrategy,
   ],
   controllers: [AuthController],
